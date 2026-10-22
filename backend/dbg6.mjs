@@ -1,0 +1,15 @@
+﻿import puppeteer from "puppeteer";
+const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox"] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1440, height: 950 });
+page.on("pageerror", (e) => console.log("PAGEERROR:\n" + e.stack));
+await page.goto("http://localhost:5173/login", { waitUntil: "networkidle2" });
+await page.waitForSelector("input[type=email]");
+await page.type("input[type=email]", "qec@uok.edu.pk");
+await page.type("input[type=password]", "UOK_QecSecret2026!");
+await page.click("button[type=submit]");
+await page.waitForFunction(() => location.pathname === "/admin", { timeout: 20000 });
+await new Promise(r=>setTimeout(r,3000));
+console.log("PATH:", await page.evaluate(()=>location.pathname));
+console.log("BODY:", (await page.evaluate(()=>document.body.innerText)).slice(0,700));
+await browser.close();
